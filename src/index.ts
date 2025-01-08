@@ -2,6 +2,8 @@ import express from "express";
 import { initialize } from "express-openapi";
 import path from "path";
 import router from "./routes/routes";
+import "dotenv/config";
+import logger from "./logger";
 
 const app = express();
 
@@ -12,12 +14,11 @@ initialize({
   paths: path.join(__dirname, "routes"),
 });
 
-const PORT = 3000;
+const port = process.env.PORT;
 
 app.use(express.json());
-app.use(router)
+app.use(router);
 
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(port, () => {
+  logger.info(`Server is running on http://localhost:${port}`);
 });
