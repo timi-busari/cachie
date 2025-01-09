@@ -1,7 +1,7 @@
 import express from "express";
 import { initialize } from "express-openapi";
 import path from "path";
-import router from "./routes/routes";
+import router from "./routes/cachie.route";
 import "dotenv/config";
 import logger from "./logger";
 import swaggerUi from "swagger-ui-express";

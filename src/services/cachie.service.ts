@@ -7,7 +7,7 @@ import {
 } from "../interfaces/types";
 import logger from "../logger";
 
-class CacheService {
+class CachieService {
   private searchData: Map<string, TokenAnalytics>;
   public queries: Array<{
     query: string;
@@ -219,4 +219,4 @@ class CacheService {
   }
 }
 
-export default new CacheService();
+export default new CachieService();

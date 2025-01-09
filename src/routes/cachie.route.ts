@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import cacheService from "../services/cache";
+import cachieService from "../services/cachie.service";
 import rateLimiter from "../middleware/rate-limiter";
 import {
   analyseSchema,
@@ -23,7 +23,7 @@ router.post(
     );
 
     try {
-      const response = cacheService.recordSearch({
+      const response = cachieService.recordSearch({
         clientId: client_id,
         searchQuery: search_query,
         sessionId: session_id,
@@ -51,7 +51,7 @@ router.get(
     );
 
     try {
-      const response = cacheService.analyzeToken({
+      const response = cachieService.analyzeToken({
         analysisToken: analysis_token as string,
         includeStats: include_stats === "true",
         matchType: match_type as MatchType,
