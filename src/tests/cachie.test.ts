@@ -1,9 +1,9 @@
-import CachieService from "../services/cachie.service";
-import logger from "../logger";
+import cachieService from "../services/cachie.service";
+import logger from "../utils/logger.util";
 import { describe, test, expect, beforeEach, jest, it } from "@jest/globals";
 
 // Mock the logger
-jest.mock("../logger", () => ({
+jest.mock("../utils/logger.util", () => ({
   info: jest.fn(),
   error: jest.fn(),
 }));
@@ -12,14 +12,14 @@ describe("CachieService", () => {
   beforeEach(() => {
     // Reset the CachieService instance before each test
     // @ts-ignore - accessing private property for testing
-    CachieService.searchData.clear();
-    CachieService.queries = [];
+    cachieService.searchData.clear();
+    cachieService.queries = [];
     jest.clearAllMocks();
   });
 
   describe("recordSearch", () => {
     it("should successfully record a search query and process tokens", () => {
-      const result = CachieService.recordSearch({
+      const result = cachieService.recordSearch({
         searchQuery: "hello world",
         clientId: "client1",
         sessionId: "session1",
@@ -30,8 +30,8 @@ describe("CachieService", () => {
       expect(result.processing_time).toMatch(/\d+ms/);
 
       // verifying query was stored
-      expect(CachieService.queries).toHaveLength(1);
-      expect(CachieService.queries[0]).toEqual({
+      expect(cachieService.queries).toHaveLength(1);
+      expect(cachieService.queries[0]).toEqual({
         query: "hello world",
         clientId: "client1",
         sessionId: "session1",
@@ -39,7 +39,7 @@ describe("CachieService", () => {
 
       // verify token was recorded
       // @ts-ignore - accessing private property for testing
-      const tokenData = CachieService.searchData.get("hello world");
+      const tokenData = cachieService.searchData.get("hello world");
       expect(tokenData).toBeDefined();
       expect(tokenData?.exact_matches).toBe(1);
       expect(tokenData?.client_distribution["client1"]).toBe(1);
@@ -48,20 +48,20 @@ describe("CachieService", () => {
 
     it("should handle multiple searches from the same client and session", () => {
       // record same search twice
-      CachieService.recordSearch({
+      cachieService.recordSearch({
         searchQuery: "test query",
         clientId: "client1",
         sessionId: "session1",
       });
 
-      CachieService.recordSearch({
+      cachieService.recordSearch({
         searchQuery: "test query",
         clientId: "client1",
         sessionId: "session1",
       });
 
       // @ts-ignore - accessing private property for testing
-      const tokenData = CachieService.searchData.get("test query");
+      const tokenData = cachieService.searchData.get("test query");
       expect(tokenData?.exact_matches).toBe(2);
       expect(tokenData?.client_distribution["client1"]).toBe(2);
       expect(tokenData?.unique_sessions.size).toBe(1);
@@ -69,12 +69,12 @@ describe("CachieService", () => {
 
     it("should log errors when processing fails", () => {
       // Mock implementation to throw error
-      jest.spyOn(CachieService.queries, "push").mockImplementation(() => {
+      jest.spyOn(cachieService.queries, "push").mockImplementation(() => {
         throw new Error("Test error");
       });
 
       expect(() =>
-        CachieService.recordSearch({
+      cachieService.recordSearch({
           searchQuery: "test query",
           clientId: "client1",
           sessionId: "session1",
@@ -87,13 +87,13 @@ describe("CachieService", () => {
 
   describe("analyzeToken", () => {
     beforeEach(() => {
-      CachieService.recordSearch({
+      cachieService.recordSearch({
         searchQuery: "hello world",
         clientId: "client1",
         sessionId: "session1",
       });
 
-      CachieService.recordSearch({
+      cachieService.recordSearch({
         searchQuery: "hello there",
         clientId: "client2",
         sessionId: "session2",
@@ -101,7 +101,7 @@ describe("CachieService", () => {
     });
 
     it("should analyze exact matches correctly", () => {
-      const result = CachieService.analyzeToken({
+      const result = cachieService.analyzeToken({
         analysisToken: "hello world",
         matchType: "exact",
         includeStats: true,
@@ -121,7 +121,7 @@ describe("CachieService", () => {
     });
 
     it("should analyze fuzzy matches correctly", () => {
-      const result = CachieService.analyzeToken({
+      const result = cachieService.analyzeToken({
         analysisToken: "hello werld", // this was intentionally misspelled
         matchType: "fuzzy",
         includeStats: true,
@@ -135,7 +135,7 @@ describe("CachieService", () => {
     });
 
     it("should handle multiple token analysis", () => {
-      const result = CachieService.analyzeToken({
+      const result = cachieService.analyzeToken({
         analysisToken: "hello world, hello there",
         matchType: "exact",
         includeStats: true,
@@ -147,7 +147,7 @@ describe("CachieService", () => {
     });
 
     it("should return empty results for non-existent tokens", () => {
-      const result = CachieService.analyzeToken({
+      const result = cachieService.analyzeToken({
         analysisToken: "nonexistent token",
         matchType: "exact",
         includeStats: true,
@@ -163,11 +163,11 @@ describe("CachieService", () => {
 
     it("should handle errors gracefully", () => {
       // mocking implementation to throw error
-      jest.spyOn(CachieService.queries, "forEach").mockImplementation(() => {
+      jest.spyOn(cachieService.queries, "forEach").mockImplementation(() => {
         throw new Error("Test error");
       });
 
-      const result = CachieService.analyzeToken({
+      const result = cachieService.analyzeToken({
         analysisToken: "test token",
         matchType: "fuzzy",
         includeStats: true,
@@ -182,11 +182,11 @@ describe("CachieService", () => {
   describe("private methods", () => {
     it("should correctly identify fuzzy matches", () => {
       // @ts-ignore - accessing private method for testing
-      const result = CachieService._isFuzzyMatch("world", "werld");
+      const result = cachieService._isFuzzyMatch("world", "werld");
       expect(result).toBe(true);
 
       // @ts-ignore - accessing private method for testing
-      const noMatch = CachieService._isFuzzyMatch("world", "completely");
+      const noMatch = cachieService._isFuzzyMatch("world", "completely");
       expect(noMatch).toBe(false);
     });
   });

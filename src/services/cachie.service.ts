@@ -4,8 +4,8 @@ import {
   MatchType,
   TokenResult,
   ProcessingStatus,
-} from "../interfaces/types";
-import logger from "../logger";
+} from "../interfaces/cachie.interface";
+import logger from "../utils/logger.util";
 
 class CachieService {
   private searchData: Map<string, TokenAnalytics>;

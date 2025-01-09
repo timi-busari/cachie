@@ -1,13 +1,13 @@
 import express, { Request, Response } from "express";
 import cachieService from "../services/cachie.service";
-import rateLimiter from "../middleware/rate-limiter";
+import rateLimiter from "../middlewares/rate-limiter.middleware";
 import {
   analyseSchema,
   searchSchema,
   validateRequest,
-} from "../middleware/validation";
-import { MatchType } from "../interfaces/types";
-import logger from "../logger";
+} from "../middlewares/validation.middleware";
+import { MatchType } from "../interfaces/cachie.interface";
+import logger from "../utils/logger.util";
 
 const router = express.Router();
 
