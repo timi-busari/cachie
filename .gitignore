@@ -1,2 +1,10 @@
 node_modules/
-dist
+/dist
+.env
+yarn-error.log
+/logs
+/logs
+logs/combined.log
+logs/error.log
+*.log
+logs/exceptions.log

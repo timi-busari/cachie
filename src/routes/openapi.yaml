@@ -4,18 +4,136 @@ info:
   version: 1.0.0
 
 paths:
-  /hello:
-    get:
-      summary: Say Hello
-      operationId: sayHello
+  /search:
+    post:
+      summary: Record a search query and process tokens.
+      operationId: recordSearch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                search_query:
+                  type: string
+                  description: The search query string.
+                  example: "example search query"
+                client_id:
+                  type: string
+                  description: The client identifier.
+                  example: "client123"
+                session_id:
+                  type: string
+                  description: The session identifier.
+                  example: "session456"
+              required:
+                - search_query
+                - client_id
+                - session_id
       responses:
         '200':
-          description: A successful response
+          description: Search query processed successfully.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
+                  status:
                     type: string
-                    example: "Hello, World!"
+                    example: "ok"
+                  processed_tokens:
+                    type: integer
+                    example: 5
+                  processing_time:
+                    type: string
+                    example: "15ms"
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "An error occurred while processing the search"
+
+  /analyse:
+    get:
+      summary: Analyze tokens based on match type.
+      operationId: analyzeToken
+      parameters:
+        - name: analysis_token
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "example_token"
+        - name: match_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [exact, fuzzy]
+            example: "exact"
+        - name: include_stats
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [true, false]
+            example: "true"
+      responses:
+        '200':
+          description: Token analysis completed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        exact_matches:
+                          type: integer
+                          example: 10
+                        fuzzy_matches:
+                          type: integer
+                          example: 5
+                        client_distribution:
+                          type: object
+                          additionalProperties:
+                            type: integer
+                            example: 3
+                        unique_sessions:
+                          type: integer
+                          example: 2
+                  stats:
+                    type: object
+                    nullable: true
+                    properties:
+                      processing_time:
+                        type: string
+                        example: "20ms"
+                      total_searches_analyzed:
+                        type: integer
+                        example: 100
+                      unique_clients:
+                        type: integer
+                        example: 10
+                      unique_sessions:
+                        type: integer
+                        example: 20
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "An error occurred while analyzing the token"
