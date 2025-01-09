@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import Joi from "joi";
+import logger from "../logger";
 
 export const validateRequest = (schema: Joi.ObjectSchema) => {
   return (req: Request, res: Response, next: NextFunction): void => {
@@ -8,11 +9,12 @@ export const validateRequest = (schema: Joi.ObjectSchema) => {
     );
 
     if (error) {
+      logger.warn(`Validation failed: ${error.details[0].message}`);
       res.status(400).json({ error: error.details[0].message });
-
       return;
     }
 
+    logger.info(`Validation passed for ${req.method} request`);
     next();
   };
 };
