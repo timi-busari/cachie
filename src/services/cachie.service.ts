@@ -4,10 +4,10 @@ import {
   MatchType,
   TokenResult,
   ProcessingStatus,
-} from "../interfaces/types";
-import logger from "../logger";
+} from "../interfaces/cachie.interface";
+import logger from "../utils/logger.util";
 
-class CacheService {
+class CachieService {
   private searchData: Map<string, TokenAnalytics>;
   public queries: Array<{
     query: string;
@@ -219,4 +219,4 @@ class CacheService {
   }
 }
 
-export default new CacheService();
+export default new CachieService();
